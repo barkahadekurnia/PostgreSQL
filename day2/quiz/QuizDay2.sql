@@ -135,13 +135,36 @@ ORDER BY masa_kerja ASC
 12. Tampilkan jumlah pegawai berdasarkan masa kerja nya.
 */
 
+SELECT 
+SUM(COALESCE(masa_kerja1525))"15>=masakerja<=25" ,
+SUM(COALESCE(masa_kerja2530))"25>=masakerja<=30" ,
+SUM(COALESCE(masa_kerja3035))"30>=masakerja<=35" 
+FROM (
+SELECT 
+CASE WHEN extract(year from age(now(),hire_date)) <= 25 THEN COUNT(employee_id) END AS masa_kerja1525 ,
+CASE WHEN extract(year from age(now(),hire_date)) > 25 AND extract(year from age(now(),hire_date)) < 30 THEN COUNT(employee_id) END AS masa_kerja2530 ,
+CASE WHEN extract(year from age(now(),hire_date)) >= 30 AND extract(year from age(now(),hire_date)) <= 35  THEN COUNT(employee_id) END AS masa_kerja3035 
+FROM employees AS foo GROUP BY hire_date,employee_id 
+) AS foo 
 
 
 /*
 13.Buat tampilan matrix jumlah pegawai berdasarkan masa kerja di tiap department
 */
 
-
+SELECT department_id , department_name,
+SUM(COALESCE(masa_kerja1525,0))"15>=masakerja<=25" ,
+SUM(COALESCE(masa_kerja2530,0))"25>=masakerja<=30" ,
+SUM(COALESCE(masa_kerja3035,0))"30>=masakerja<=35" 
+FROM (
+SELECT departments.department_id , departments.department_name,
+CASE WHEN extract(year from age(now(),hire_date)) <= 25 THEN COUNT(employee_id) END AS masa_kerja1525 ,
+CASE WHEN extract(year from age(now(),hire_date)) > 25 AND extract(year from age(now(),hire_date)) < 30 THEN COUNT(employee_id) END AS masa_kerja2530 ,
+CASE WHEN extract(year from age(now(),hire_date)) >= 30 AND extract(year from age(now(),hire_date)) <= 35  THEN COUNT(employee_id) END AS masa_kerja3035 
+FROM employees JOIN departments ON employees.department_id = departments.department_id
+GROUP BY departments.department_id , departments.department_name,employees.hire_date,employees.employee_id 
+) AS fooo GROUP BY department_id , department_name 
+ORDER BY department_name ASC
 
 
 

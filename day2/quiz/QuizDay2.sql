@@ -89,5 +89,83 @@ GROUP BY departments.department_id, departments.department_name
 ORDER BY total_emps  ASC
 ;
 
+/*
+9. Tampilkan jumlah employee tiap department yang ada di region America
+*/
+
+SELECT  departments.department_id , departments.department_name , 
+count(departments.department_name) total_emps
+FROM regions 
+JOIN countries ON regions.region_id = countries.region_id 
+JOIN locations ON countries.country_id = locations.country_id
+JOIN departments ON locations.location_id = departments.location_id
+JOIN employees ON departments.department_id = employees.department_id
+WHERE regions.region_name = 'Americas'
+GROUP BY departments.department_id, departments.department_name 
+ORDER BY total_emps  ASC
+;
+
+/*
+10.Tampilkan employees yang mendapatkan bonus akhir tahun, jika masa kerja employees >= 25 
+tahun akan mendapatkan bonus 5x salary, jika kurang akan mendapatkan 3x salary. Hint : 
+gunakan extract(year from age(now(),hire_date))
+*/
+
+
+select employees.employee_id,employees.first_name,employees.last_name,employees.salary, 
+extract(year from age(now(),hire_date)) as masa_kerja, 
+CASE WHEN extract(year from age(now(),hire_date)) >= 25 THEN salary*5 ELSE salary*3 END AS bonus 
+from employees 
+
+
+/*
+11.Tampilkan bonus tiap masa kerja 
+*/
+
+
+SELECT masa_kerja, sum(salary*5) bonus FROM (
+SELECT employee_id,first_name,last_name,salary, 
+extract(year from age(now(),hire_date)) masa_kerja
+FROM employees 
+) as foo WHERE masa_kerja >= 25
+GROUP BY employee_id,first_name,last_name,salary,foo.masa_kerja
+ORDER BY masa_kerja  ASC 
+
+/*
+12. Tampilkan jumlah pegawai berdasarkan masa kerja nya.
+*/
+
+
+-- masa kerja 15 - 25
+SELECT count(masa_kerja) masa_kerjakurangdari25
+FROM  (
+SELECT extract(year from age(now(),hire_date)) masa_kerja
+FROM employees 
+ORDER BY masa_kerja  ASC 
+) as fo WHERE masa_kerja >= 15 AND masa_kerja <= 25 
+
+-- masa kerja 25 - 30
+SELECT count(masa_kerja) masa_kerjaantara25dan30
+FROM  (
+SELECT extract(year from age(now(),hire_date)) masa_kerja
+FROM employees 
+ORDER BY masa_kerja  ASC 
+) as foo WHERE masa_kerja >= 25 AND masa_kerja <= 30
+
+-- masa kerja 30 - 35
+SELECT count(masa_kerja) masa_kerjaantara25dan30
+FROM  (
+SELECT extract(year from age(now(),hire_date)) masa_kerja
+FROM employees 
+ORDER BY masa_kerja  ASC 
+) as foo WHERE masa_kerja >= 30 AND masa_kerja <= 35
+
+/*
+13.Buat tampilan matrix jumlah pegawai berdasarkan masa kerja di tiap department
+*/
+
+
+
+
 
 

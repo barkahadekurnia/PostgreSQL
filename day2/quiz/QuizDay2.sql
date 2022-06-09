@@ -111,54 +111,31 @@ tahun akan mendapatkan bonus 5x salary, jika kurang akan mendapatkan 3x salary. 
 gunakan extract(year from age(now(),hire_date))
 */
 
-
-select employees.employee_id,employees.first_name,employees.last_name,employees.salary, 
-extract(year from age(now(),hire_date)) as masa_kerja, 
+SELECT employees.employee_id,employees.first_name,employees.last_name,employees.salary, 
+extract(year from age(now(),hire_date)) masa_kerja, 
 CASE WHEN extract(year from age(now(),hire_date)) >= 25 THEN salary*5 ELSE salary*3 END AS bonus 
-from employees 
-
+FROM employees 
 
 /*
 11.Tampilkan bonus tiap masa kerja 
 */
 
-
-SELECT masa_kerja, sum(salary*5) bonus FROM (
-SELECT employee_id,first_name,last_name,salary, 
-extract(year from age(now(),hire_date)) masa_kerja
+SELECT masa_kerja , 
+SUM(COALESCE(bonus))"bonus"
+FROM (
+SELECT 
+extract(year from age(now(),hire_date)) masa_kerja, 
+CASE WHEN extract(year from age(now(),hire_date)) >= 25 THEN salary*5 ELSE salary*3 END AS bonus 
 FROM employees 
-) as foo WHERE masa_kerja >= 25
-GROUP BY employee_id,first_name,last_name,salary,foo.masa_kerja
-ORDER BY masa_kerja  ASC 
+) as foo 
+GROUP BY masa_kerja 
+ORDER BY masa_kerja ASC 
 
 /*
 12. Tampilkan jumlah pegawai berdasarkan masa kerja nya.
 */
 
 
--- masa kerja 15 - 25
-SELECT count(masa_kerja) masa_kerjakurangdari25
-FROM  (
-SELECT extract(year from age(now(),hire_date)) masa_kerja
-FROM employees 
-ORDER BY masa_kerja  ASC 
-) as fo WHERE masa_kerja >= 15 AND masa_kerja <= 25 
-
--- masa kerja 25 - 30
-SELECT count(masa_kerja) masa_kerjaantara25dan30
-FROM  (
-SELECT extract(year from age(now(),hire_date)) masa_kerja
-FROM employees 
-ORDER BY masa_kerja  ASC 
-) as foo WHERE masa_kerja >= 25 AND masa_kerja <= 30
-
--- masa kerja 30 - 35
-SELECT count(masa_kerja) masa_kerjaantara25dan30
-FROM  (
-SELECT extract(year from age(now(),hire_date)) masa_kerja
-FROM employees 
-ORDER BY masa_kerja  ASC 
-) as foo WHERE masa_kerja >= 30 AND masa_kerja <= 35
 
 /*
 13.Buat tampilan matrix jumlah pegawai berdasarkan masa kerja di tiap department
